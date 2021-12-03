@@ -112,7 +112,7 @@ namespace AdventofCode._2021.Day02
 
         [Theory]
         [MemberData(nameof(Part2Commands))]
-        public void TestMovesPart2(List<string> commands, int expectedHorizontal, int expectedDepth, int aim, int expectedMutliply)
+        public void TestMovesPart2(List<string> commands, int expectedHorizontal, int expectedDepth, int expectedAim, int expectedMutliply)
         {
             // Arrange
             var map = new Part2.Map();
@@ -127,7 +127,7 @@ namespace AdventofCode._2021.Day02
             Assert.Equal(expectedMutliply, map.Position.Horizontal * map.Position.Depth);
             Assert.Equal(expectedHorizontal, map.Position.Horizontal);
             Assert.Equal(expectedDepth, map.Position.Depth);
-            Assert.Equal(aim, map.Position.Aim);
+            Assert.Equal(expectedAim, map.Position.Aim);
         }
     }
 }
