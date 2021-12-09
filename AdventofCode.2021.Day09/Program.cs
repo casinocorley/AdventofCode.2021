@@ -1,23 +1,31 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System.Numerics;
+Console.WriteLine("******* Part 1 ********");
+AnswerPart1("ExampleData.txt");
+AnswerPart1("PuzzleData.txt");
 
-var riskLevel1 = GetSolutionPart1("ExampleData.txt");
-var riskLevel2 = GetSolutionPart1("PuzzleData.txt");
+Console.WriteLine();
 
-Console.WriteLine($"Answer for ExampleData.txt is: {riskLevel1}");
-Console.WriteLine($"Answer for PuzzleData.txt is: {riskLevel2}");
+Console.WriteLine("******* Part 2 ********");
+AnswerPart2("ExampleData.txt");
+AnswerPart2("PuzzleData.txt");
 
-var part2Answer1 = GetSolutionPart2("ExampleData.txt");
-var part2Answer2 = GetSolutionPart2("PuzzleData.txt");
-
-Console.WriteLine($"Basin Level for ExampleData.txt is: {part2Answer1}");
-Console.WriteLine($"Basin Level for PuzzleData.txt is: {part2Answer2}");
-
-int GetSolutionPart1(string fileName)
+void AnswerPart1(string file)
 {
-    var lines = GetData(fileName);
+    var data = GetData(file);
+    var answer = GetSolutionPart1(data);
+    Console.WriteLine($"{file}: {answer}");
+}
 
+void AnswerPart2(string file)
+{
+    var data = GetData(file);
+    var answer = GetSolutionPart2(data);
+    Console.WriteLine($"{file}: {answer}");
+}
+
+int GetSolutionPart1(List<char[]> lines) 
+{
     var length = lines[0].Length;
     var height = lines.Count;
 
@@ -49,11 +57,8 @@ int GetSolutionPart1(string fileName)
     return riskLevel;
 }
 
-
-int GetSolutionPart2(string fileName)
+int GetSolutionPart2(List<char[]> lines)
 {
-    var lines = GetData(fileName);
-
     var length = lines[0].Length;
     var height = lines.Count;
     
@@ -76,64 +81,10 @@ int GetSolutionPart2(string fileName)
             if (!(current < surroundingPoints.Min())) 
                 continue;
             
+            // Get Basin Area
             
-            var basinPoints = new List<Point>();
-                
-            // current point
-            basinPoints.Add(new Point(x,y));
-                
-            // left
-            for (var i = x-1; i >= 0; i--)
-            {
-                if (lines.GetValue(i, y) == 9) 
-                    break;
-                    
-                if (basinPoints.Exists(i,y))
-                    break;
-                    
-                basinPoints.Add(new Point(i,y));
-                lines.GetSurroundingArea(i, y, basinPoints);
-            }
-                
-            // right
-            for (var i = x+1; i < length; i++)
-            {
-                if (lines.GetValue(i, y) == 9)
-                    break;
-                    
-                if (basinPoints.Exists(i,y))
-                    break;
-                    
-                basinPoints.Add(new Point(i,y));
-                lines.GetSurroundingArea(i, y, basinPoints);
-            }
-                
-            // above
-            for (var i = y-1; i >= 0; i--)
-            {
-                if (lines.GetValue(x, i) == 9)
-                    break;
-                    
-                if (basinPoints.Exists(x,i))
-                    break;
-                    
-                basinPoints.Add(new Point(x,i));
-                lines.GetSurroundingArea(x, i, basinPoints);
-            }
-                
-            // below
-            for (var i = y+1; i < height; i++)
-            {
-                if (lines.GetValue(x, i) == 9)
-                    break;
-                    
-                if (basinPoints.Exists(x,i))
-                    break;
-                    
-                basinPoints.Add(new Point(x,i));
-                lines.GetSurroundingArea(x, i, basinPoints);
-            }
-                
+            var basinPoints = new List<Point> { new (x, y) };
+            lines.GetSurroundingArea(basinPoints.First(), basinPoints);
             basinArea.Add(basinPoints.Count);
         }
     }
@@ -167,6 +118,11 @@ public class Point
 
 public static class Extensions
 {
+    public static int? GetValue(this List<char[]> lines, Point point)
+    {
+        return lines.GetValue(point.X, point.Y);
+    }
+    
     public static int? GetValue(this List<char[]> lines, int x, int y)
     {
         if (x < 0 ||
@@ -182,63 +138,70 @@ public static class Extensions
         return int.Parse(lines[y][x].ToString());
     }
 
-    public static bool Exists(this List<Point> points, int x, int y)
+    public static bool Exists(this List<Point> points, Point point)
     {
-        return points.Any(point => point.X == x && point.Y == y);
+        return points.Any(p => p.X == point.X && p.Y == point.Y);
     }
     
-    public static void GetSurroundingArea(this List<char[]> lines, int x, int y, List<Point> area)
+    public static void GetSurroundingArea(this List<char[]> lines, Point p1, List<Point> area)
     {
+        var x = p1.X;
+        var y = p1.Y;
+        
         // left
         for (var i = x-1; i >= 0; i--)
         {
-            if (lines.GetValue(i, y) == 9)
+            var point = new Point(i,y);
+            if (lines.GetValue(point) == 9)
                 break;
 
-            if (area.Any(point => point.X == i && point.Y == y))
+            if (area.Exists(point))
                 break;
             
-            area.Add(new Point(i,y));
-            lines.GetSurroundingArea(i, y, area);
+            area.Add(point);
+            lines.GetSurroundingArea(point, area);
         }
         
         // right
         for (var i = x+1; i < lines[0].Length; i++)
         {
-            if (lines.GetValue(i, y) == 9)
+            var point = new Point(i,y);
+            if (lines.GetValue(point) == 9)
                 break;
 
-            if (area.Any(point => point.X == i && point.Y == y))
+            if (area.Exists(point))
                 break;
             
             area.Add(new Point(i,y));
-            lines.GetSurroundingArea(i, y, area);
+            lines.GetSurroundingArea(point, area);
         }
         
         // above
         for (var i = y-1; i >= 0; i--)
         {
-            if (lines.GetValue(x, i) == 9)
+            var point = new Point(x, i);
+            if (lines.GetValue(point) == 9)
                 break;
 
-            if (area.Any(point => point.X == x && point.Y == i))
+            if (area.Exists(point))
                 break;
             
-            area.Add(new Point(x,i));
-            lines.GetSurroundingArea(x, i, area);
+            area.Add(point);
+            lines.GetSurroundingArea(point, area);
         }
         
         // below
         for (var i = y+1; i < lines.Count; i++)
         {
-            if (lines.GetValue(x, i) == 9)
+            var point = new Point(x, i);
+            if (lines.GetValue(point) == 9)
                 break;
 
-            if (area.Any(point => point.X == x && point.Y == i))
+            if (area.Exists(point))
                 break;
             
-            area.Add(new Point(x,i));
-            lines.GetSurroundingArea(x, i, area);
+            area.Add(point);
+            lines.GetSurroundingArea(point, area);
         }
     }
 }
