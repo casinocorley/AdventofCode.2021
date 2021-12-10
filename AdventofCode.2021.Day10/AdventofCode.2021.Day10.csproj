@@ -9,10 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="ExampleData.txt">
+      <None Update="ExampleData1.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="PuzzleData.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="ExampleData2.txt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
