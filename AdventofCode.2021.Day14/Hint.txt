@@ -1,0 +1,9 @@
+Hint from boast03
+
+The concept is quiet easy:
+1. parse the rules line by line (GetPairInsertionRules)
+2. initialize and count the first pairs occurring in the template string (InitOccurrences)
+3. then for each iteration, just "move" the pairs count according to the rules you parsed. Note that for the rule AB -> C you "remove" the count for AB and add that count to AC and CB. This gets clear if you have a really simple example: template AAA, rules: AA -> B BA -> A, AB -> A and BB -> A. The initial pass should net you 2 times the pair AA. If we apply the rule, we get ABABA. Which we also can write as the new pairs AB, BA, AB, BA -- which we also can get from just looking at the very first rule and the resulting two new pairs. Also note that it should be obvious, that the order of the pairs does not matter for further generation: the pair BA will always result in two new pairs BA AA, regardless of the position in the template. If we have 324 BA pairs somewhere in the template, we get after one step 324 new BA and 324 new AA templates. So we just ignore the position altogether and stupidly count pairs.
+4. to count the occurrences, I just use the first letter (string to byte conversion) of each pair and add ONE to the last letter in the template, as it was never part of a pair but still in the final template.
+5. eventually a small min-max algorithm to find the lowest and highest value in the map
+so here we go with code -- sorry for the code quality, I use go since 01.12.2021 ;-)
