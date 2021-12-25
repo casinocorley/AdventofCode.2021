@@ -1,23 +1,17 @@
 using System.Diagnostics;
 
-[DebuggerDisplay("({Location.X},{Location.Y}): {Value}, IsSet:{IsSet}")]
-public class RiskInfo : IComparable
+namespace AdventofCode._2021.Day15;
+
+[DebuggerDisplay("({Location.X},{Location.Y}): {Value}")]
+public class RiskInfo
 {
     public (int X, int Y) Location { get; }
     public int Value { get; set; }
-
-    public bool IsSet { get; set; }
 
     public RiskInfo((int X, int Y) location)
     {
         Location = location;
         Value = Int32.MaxValue;
-        IsSet = false;
-    }
-
-    public int CompareTo(object? obj)
-    {
-        throw new NotImplementedException();
     }
 }
 
