@@ -22,13 +22,4 @@ Console.WriteLine($"Lowest Risk is : {answer2}; Answer took {watch1.Elapsed.Tota
 // Answer for data2 is 2967, 2835 - took 2116 secs
 
 
-/*Stopwatch watch2 = new();
-watch2.Start();
-
-var puzzle = new Puzz15();
-var answer = puzzle.GiveMeTheAnswerPart20();
-
-watch2.Stop();
-Console.WriteLine($"Lowest Risk is : {answer}; Answer took {watch2.Elapsed.TotalSeconds} seconds");*/
-
 

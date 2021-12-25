@@ -11,31 +11,32 @@ public class Solution1
 
     public int Solve()
     {
-        var levels = GetData(filename);
-        var answer = Dijkstra(levels);
+        var data = GetData(filename);
+        var answer = Dijkstra(data);
         
         return answer;
     }
 
-    private int Dijkstra(Dictionary<(int X, int Y), int> riskLevels)
+    private int Dijkstra(Dictionary<(int X, int Y), int> distances)
     {
         // Assume a square
-        var size = (int) Math.Sqrt(riskLevels.Count);
+        var size = (int) Math.Sqrt(distances.Count);
 
-        var destination = riskLevels
+        var destination = distances
             .Keys
             .MaxBy(x => x.X + x.Y);
-
-        PriorityQueue<(int X, int Y), int> queue = new();
-
-        var lowest = riskLevels
-            .ToDictionary(x => x.Key, x => int.MaxValue);
-
+        
         (int X, int Y) start = (0, 0);
-        lowest[start] = 0;
-        queue.Enqueue(start, lowest[start]);
+
+        var shortestPaths = distances
+            .ToDictionary(x => x.Key, x => int.MaxValue);
+        shortestPaths[start] = 0;
+        
+        PriorityQueue<(int X, int Y), int> queue = new();
+        queue.Enqueue(start, shortestPaths[start]);
         
         (int X, int Y) current;
+        
         do
         {
             current = queue.Dequeue();
@@ -44,16 +45,16 @@ public class Solution1
 
             foreach (var neighbor in neighbors)
             {
-                if (lowest[neighbor] > lowest[current] + riskLevels[neighbor])
+                if (shortestPaths[neighbor] > shortestPaths[current] + distances[neighbor])
                 {
-                    lowest[neighbor] = lowest[current] + riskLevels[neighbor];
-                    queue.Enqueue(neighbor, lowest[neighbor]);
+                    shortestPaths[neighbor] = shortestPaths[current] + distances[neighbor];
+                    queue.Enqueue(neighbor, shortestPaths[neighbor]);
                 }
             }
     
         } while (current != destination);
         
-        return lowest[current];
+        return shortestPaths[current];
     }
     
     private List<(int X, int Y)> GetNeighbors((int X, int Y) p, int size)
@@ -69,23 +70,11 @@ public class Solution1
     
     protected virtual Dictionary<(int X, int Y), int> GetData(string dataFile)
     {
-        var data = File
-            .ReadLines(dataFile)
-            .Select(s => s.ToCharArray())
-            .Select(x => x.Select(c => int.Parse(c.ToString())).ToList())
-            .ToList();
-
-        Dictionary<(int X, int Y), int> dict = new();
-
-        for (var y = 0; y < data.Count; y++)
-        {
-            for (var x = 0; x < data[0].Count; x++)
-            {
-                dict.Add((x, y), data[y][x]);
-            }
-        }
-
-        return dict;
+        return File
+            .ReadAllLines(dataFile)
+            .SelectMany((line, y) => line
+                .Select((c, x) => (Key: (X:x, Y:y), Value: int.Parse(c.ToString())))
+                .ToArray())
+            .ToDictionary(x => x.Key, x => x.Value);
     }
-    
 }
